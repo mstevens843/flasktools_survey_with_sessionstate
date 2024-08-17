@@ -5,6 +5,8 @@ This is a simple Flask web application that allows users to take a survey. The s
 ## Features
 
 - A dynamic survey with multiple questions.
+- Answers are stored in the session for each individual user.
+- Some questions allow users to provide additional comments along with their answers.
 - Answers are stored on the server.
 - Flash messages notify users if they try to access a question out of order.
 - Responsive and sleek design. 
