@@ -2,7 +2,10 @@
 {% block content %}
     <h1>{{ survey.title }}</h1>
     <p>{{ survey.instructions }}</p>
-    <a href="/questions/0">Start Survey</a>
+    <!--  Modified start survey button to send POST request to /start-survey route -->
+    <form action="/start-survey" method="POST">
+        <button type="submit">Start Survey</button>
+    </form>
 {% endblock %}
 
 

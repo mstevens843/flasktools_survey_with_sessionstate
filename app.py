@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, request, flash
+from flask import Flask, render_template, redirect, request, flash, session
 from surveys import satisfaction_survey # imports survey. 
 
 print(satisfaction_survey)  # check if import works
@@ -17,8 +17,18 @@ def start():
     # render start.html; and pass thr survey object to the template
     return render_template('start.html', survey=satisfaction_survey)
 
+#############################################################################
+# NEW ROUTE TO HANDLE POST REQUEST THAT INITIALIZES session['responses']
+@app.route('/start-survey', methods=["POST"])
+def start_survey():
+    session["responses"] = [] # initalized empty lists to hold responsess in
+    return redirect('/questions/0') #redirect to 1st question
+
 @app.route('/questions/<int:qid>')
 def show_question(qid):
+    # get responses from the current session
+    responses = session.get("responses", [])
+
     # if user tries to access invalid question, flash message and redirect them to next question.
     if len(responses) != qid:
         flash("You're trying to access an invalid question.")
@@ -31,19 +41,29 @@ def show_question(qid):
 # handle answers
 @app.route('/answer', methods=["POST"])
 def handle_answer():
-    # retrieve the anserr submitted via form, and append it to the responses list. 
+    # Get responses from the session
+    responses = session.get("responses", [])
+
+    # Retrieve the answer submitted via the form
     answer = request.form['answer']
-    responses.append(answer)
+    # Retrieve the comment if the form has it
+    comment = request.form.get('comment', None)
 
-    # increment qid to move to next question.
-    qid = int(request.form['qid']) + 1
+    # Add both the answer and the comment to the responses list
+    responses.append({"answer": answer, "comment": comment})
 
-    # if user answers all questions redirect them to the thank you page. 
+    # Save the updated responses back to the session
+    session["responses"] = responses
+
+    # Determine the next question ID
+    qid = len(responses)
+
+    # If all questions are answered, redirect to the thank-you page
     if qid >= len(satisfaction_survey.questions):
         return redirect('/thankyou')
     else:
-        # if there are more questions left, redirect to next question.
         return redirect(f'/questions/{qid}')
+
 
 
 
@@ -51,6 +71,12 @@ def handle_answer():
 @app.route('/thankyou')
 def thank_user():
     return render_template('thankyou.html')
+
+
+@app.route('/debug-session')
+def debug_session():
+    # Display the session data on the page
+    return f"Session data: {session.get('responses', [])}"
 
 
 

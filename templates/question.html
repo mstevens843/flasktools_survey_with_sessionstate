@@ -1,12 +1,18 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>{{ question.question }}</h1>
-<form method="POST" action="/answer">
-    {% for choice in question.choices %}
-        <input type="radio" name="answer" value="{{ choice }}">{{ choice }}<br>
-    {% endfor %}
-    <input type="hidden" name="qid" value="{{ qid }}">
-    <button type="submit">Submit</button>
-</form>
+    <h1>{{ question.question }}</h1>
+    <form method="POST" action="/answer">
+        {% for choice in question.choices %}
+            <input type="radio" name="answer" value="{{ choice }}">{{ choice }}<br>
+        {% endfor %}
+        
+        {% if question.allow_text %}
+            <label for="comment">Additional Comments:</label><br>
+            <textarea name="comment" id="comment" rows="4" cols="50"></textarea><br>
+        {% endif %}
+
+        <input type="hidden" name="qid" value="{{ qid }}">
+        <button type="submit">Submit</button>
+    </form>
 {% endblock %}
